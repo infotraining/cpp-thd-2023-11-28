@@ -1,0 +1,42 @@
+BasedOnStyle: WebKit
+AlignTrailingComments: true
+AllowShortBlocksOnASingleLine: Always
+AllowShortEnumsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: InlineOnly
+AllowShortLambdasOnASingleLine: Inline
+#BreakBeforeBraces: Allman
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterCaseLabel: true
+  AfterClass: true
+  AfterControlStatement: Always
+  AfterEnum: false
+  AfterFunction: true
+  AfterNamespace: true
+  AfterStruct: true
+  AfterUnion: true
+  AfterExternBlock: true
+  BeforeCatch: true
+  BeforeElse: true
+  BeforeWhile: false
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: false
+BreakBeforeConceptDeclarations: true
+BreakConstructorInitializersBeforeComma: false
+ContinuationIndentWidth: 4
+Cpp11BracedListStyle: true
+EmptyLineBeforeAccessModifier: LogicalBlock
+FixNamespaceComments: true
+IncludeBlocks: Regroup
+IndentRequires: true
+LambdaBodyIndentation: Signature
+NamespaceIndentation: All
+Standard: Latest
+#QualifierOrder: ['inline', 'static', 'type', 'const', 'volatile']
+PointerAlignment: Left
+ReferenceAlignment: Left
+SpaceBeforeCpp11BracedList: false
+#RequiresClausePosition: Ownline
+
+# {BasedOnStyle: WebKit, AlignTrailingComments: true, AllowShortBlocksOnASingleLine: Always, AllowShortEnumsOnASingleLine: true, AllowShortFunctionsOnASingleLine: InlineOnly, AllowShortLambdasOnASingleLine: All, BreakBeforeBraces: Allman, BreakBeforeConceptDeclarations: true, BreakConstructorInitializersBeforeComma: false, ContinuationIndentWidth: 4, EmptyLineBeforeAccessModifier: LogicalBlock, IncludeBlocks: Regroup, IndentRequires: true, LambdaBodyIndentation: Signature, NamespaceIndentation: All, Cpp11BracedListStyle: true, Standard: Latest}
