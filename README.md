@@ -1,5 +1,9 @@
 # Szkolenie - Programowanie wielowątkowe w C++ #
 
+## Linki
+
+* https://github.com/josuttis/jthread
+
 ## Dokumentacja + slajdy
 
 * https://infotraining.bitbucket.io/cpp-thd
