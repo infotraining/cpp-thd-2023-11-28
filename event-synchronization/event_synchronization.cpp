@@ -114,10 +114,10 @@ namespace CV
         {
 
             std::unique_lock lk{mtx_is_data_ready_};
-            // while(!is_data_ready_)
+            //while(!is_data_ready_)
             //{
             //     cv_data_ready_.wait(lk); // idle wait
-            // }
+            //}
             cv_data_ready_.wait(lk, [this] { return is_data_ready_; });
 
             lk.unlock();
@@ -146,6 +146,7 @@ int main()
         std::jthread thd_consumer_1{[&data] {
             data.process(1);
         }};
+
         std::jthread thd_consumer_2{[&data] {
             data.process(2);
         }};
