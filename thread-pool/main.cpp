@@ -3,10 +3,27 @@
 #include <cassert>
 #include <chrono>
 #include <functional>
+#include <future>
 #include <iostream>
+#include <random>
 #include <string>
 #include <thread>
 #include <vector>
+
+int calculate_square(int x)
+{
+    std::cout << "Starting calculation for " << x << " in " << std::this_thread::get_id() << std::endl;
+
+    std::random_device rd;
+    std::uniform_int_distribution<> distr(100, 5000);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(distr(rd)));
+
+    if (x % 13 == 0)
+        throw std::runtime_error("Error#13");
+
+    return x * x;
+}
 
 using Task = std::function<void()>;
 
@@ -75,9 +92,9 @@ class ThreadPool
         {
             if (end_of_work_)
                 break;
-            
+
             Task task;
-            tasks_.pop(task);            
+            tasks_.pop(task);
             task();
         }
     }
@@ -101,10 +118,16 @@ public:
             thd.join();
     }
 
-    void submit(Task task)
+    template <typename Function>
+    auto submit(Function&& f)
     {
-        std::cout << "ThreadPool::submit" << std::endl;
-        tasks_.push(std::move(task));
+        using T = decltype(f());
+
+        auto f_wrapped = std::make_shared<std::packaged_task<T()>>(std::forward<Function>(f));
+        auto f_result = f_wrapped->get_future();
+        tasks_.push([f_wrapped] { (*f_wrapped)(); });
+
+        return f_result;
     }
 };
 
@@ -129,14 +152,34 @@ int main()
     std::cout << "Main thread starts..." << std::endl;
     const std::string text = "Hello Threads";
 
+    std::vector<std::future<int>> f_squares;
+
     {
         ThreadPool thd_pool(std::thread::hardware_concurrency());
 
         thd_pool.submit([] { background_work(1, "Hello", 250ms); });
 
+        
+
         for (int i = 2; i < 30; ++i)
         {
-            thd_pool.submit([i] { background_work(i, "BW#"s + std::to_string(i), 350ms); });
+            auto f = thd_pool.submit([i] { return calculate_square(i); });
+            f_squares.push_back(std::move(f));
+        }
+
+        std::cout << "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\" << std::endl;
+
+        for (auto& fs : f_squares)
+        {
+            try
+            {
+                int s = fs.get();
+                std::cout << "Result: " << s << std::endl;
+            }
+            catch (const std::exception& e)
+            {
+                std::cout << e.what() << "\n";
+            }
         }
     }
 

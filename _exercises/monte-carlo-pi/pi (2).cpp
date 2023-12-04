@@ -10,7 +10,6 @@
 #include <numeric>
 #include <random>
 #include <thread>
-#include <ranges>
 
 /*******************************************************
  * https://academo.org/demos/estimating-pi-monte-carlo
@@ -33,23 +32,6 @@ void calc_hits(const uintmax_t count, uintmax_t& hits)
         if (x * x + y * y < 1)
             hits++;
     }
-}
-
-uintmax_t calculate_hits(const uintmax_t count)
-{
-    std::mt19937_64 rnd_gen(std::hash<std::thread::id>{}(std::this_thread::get_id()));
-    std::uniform_real_distribution<double> rnd(0, 1.0);
-
-    uintmax_t local_hits{};
-    for (uintmax_t n = 0; n < count; ++n)
-    {
-        double x = rnd(rnd_gen);
-        double y = rnd(rnd_gen);
-        if (x * x + y * y < 1)
-            local_hits++;
-    }
-
-    return local_hits;
 }
 
 void calc_hits_local_counter(const uintmax_t count, uintmax_t& hits)
@@ -252,38 +234,6 @@ void pi_with_padding()
     cout << "Elapsed = " << elapsed_time << "ms" << endl;
 }
 
-void pi_with_futures()
-{
-    cout << "Pi calculation started! Futures" << endl;
-    const auto start = chrono::high_resolution_clock::now();
-
-    //uintmax_t hits = 0;
-    const unsigned int number_of_cores = std::thread::hardware_concurrency();
-    const uintmax_t chunk_size = N / number_of_cores;
-
-    std::vector<std::future<uintmax_t>> hits_vec;    
-
-    for (int i = 0; i < number_of_cores; ++i)
-    {
-        hits_vec.push_back(std::async(std::launch::async, [chunk_size]{ return calculate_hits(chunk_size); }));
-    }
-
-    /*hits = std::accumulate(hits_vec.begin(), hits_vec.end(), 0ULL, 
-                           [](uintmax_t hits, std::future <uintmax_t>& f_hits) { return hits + f_hits.get(); });*/
-
-    /*hits = std::transform_reduce(std::execution::seq, hits_vec.begin(), hits_vec.end(), 0ULL, std::plus{}, [](auto& f) { return f.get(); });*/
-
-    auto hits = hits_vec | std::views::transform([](auto& f) { return f.get(); });
-
-    const double pi = static_cast<double>(std::accumulate(hits.begin(), hits.end(), 0ULL)) / N * 4;
-
-    const auto end = chrono::high_resolution_clock::now();
-    const auto elapsed_time = chrono::duration_cast<chrono::milliseconds>(end - start).count();
-
-    cout << "Pi = " << pi << endl;
-    cout << "Elapsed = " << elapsed_time << "ms" << endl;
-}
-
 int main()
 {
     single_thread_pi();
@@ -303,8 +253,4 @@ int main()
     std::cout << "-------------\n";
 
     pi_with_atomic();
-
-    std::cout << "-------------\n";
-
-    pi_with_futures();
 }
