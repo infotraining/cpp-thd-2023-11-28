@@ -19,8 +19,8 @@ int calculate_square(int x)
 
     std::this_thread::sleep_for(std::chrono::milliseconds(distr(rd)));
 
-    if (x % 3 == 0)
-        throw std::runtime_error("Error#3");
+    if (x % 13 == 0)
+        throw std::runtime_error("Error#13");
 
     return x * x;
 }
@@ -36,4 +36,29 @@ void save_to_file(const std::string& filename)
 
 int main()
 {
+    std::future<int> f_square4 = std::async(std::launch::async, calculate_square, 4);
+    std::future<int> f_square16 = std::async(std::launch::async, [] { return calculate_square(16); });
+    std::future<int> f_square13 = std::async(std::launch::async, calculate_square, 13);
+    std::future<void> f_save = std::async(std::launch::async, save_to_file, "data.dat");
+
+    while(f_save.wait_for(100ms) != std::future_status::ready)
+    {
+        /*std::cout << ".";
+        std::cout.flush();*/
+    }
+
+    std::cout << "square(4) = " << f_square4.get() << "\n";
+    std::cout << "square(16) = " << f_square16.get() << "\n";
+
+    try
+    {
+        int sq_13 = f_square13.get();
+    }
+    catch(const std::runtime_error& e)
+    {
+        std::cout << "Caught an error: " << e.what() << std::endl;
+    }
+    
+
+    f_save.wait();
 }
